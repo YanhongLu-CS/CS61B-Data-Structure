@@ -1,81 +1,112 @@
 public class ArrayDeque<T> {
     private T[] items;
     private int size;
-
+    private int nextFirst;
+    private int nextLast;
+    private static int startlength = 8;
+    private static int min_length = 8;
     public ArrayDeque() {
-        items = (T[]) new Object[100];
+        items = (T[]) new Object[startlength];
         size = 0;
+        nextFirst = 0;
+        nextLast = 1;
+
     }
-    public ArrayDeque(ArrayDeque<T> other) {
-        items = (T[]) new Object[other.items.length];
-        System.arraycopy(other.items, 0, items, 0, other.size);
-        size = other.size;
-    }
+
     public ArrayDeque(T item) {
         this();
-        addFirst(item);
+        addLast(item);
     }
 
-    public void addLast(T item) {
-        if (size == items.length) {
-            resize(size * 2);
+    public ArrayDeque(ArrayDeque<T> other) {
+        this();
+        for (int i = 0; i < other.size(); i++) {
+            addLast(other.get(i));
         }
-        items[size] = item;
-        size += 1;
     }
+
+    private int plus_one(int index) {
+        return (index + 1) % items.length;
+    }
+
+    private int minus_one(int index) {
+        if (index == 0) {
+            return items.length - 1;
+        }
+        return index - 1;
+    }
+
     private void resize(int capacity) {
         T[] a = (T[]) new Object[capacity];
-        System.arraycopy(items, 0, a, 0, size);
+        for (int i = 0; i < size; i++) {
+            a[i] = items[(nextFirst + 1 + i) % items.length];
+        }
         items = a;
+        nextFirst = items.length - 1;
+        nextLast = size;
+    }
+    public void addLast(T item) {
+        if (size == items.length) {
+            resize(items.length * 2);
+        }
+        items[nextLast] = item;
+        size += 1;
+        nextLast = plus_one(nextLast);
+    }
+
+    public void addFirst(T item) {
+        if (size == items.length) {
+            resize(items.length * 2);
+        }
+        items[nextFirst] = item;
+        size += 1;
+        nextFirst = minus_one(nextFirst);
     }
 
     public int size() {
         return size;
     }
+
     public boolean isEmpty() {
         return (size == 0);
     }
 
-    public void addFirst(T item) {
-        if (size == items.length) {
-            resize(size * 2);
-        }
-        System.arraycopy(items, 0, items, 1, size);
-        items[0] = item;
-        size += 1;
+    private double getUtilizationRate() {
+        return (double) size / (double) items.length;
     }
+
     public T removeFirst() {
-        if (isEmpty()) {
-            return null;
-        }
-        T returnItem = items[0];
-        System.arraycopy(items, 1, items, 0, size - 1);
+        if (isEmpty()) return null;
+        T temp = items[plus_one(nextFirst)];
+        items[plus_one(nextFirst)] = null;
+        nextFirst = plus_one(nextFirst);
         size -= 1;
-        return returnItem;
+        if (getUtilizationRate() < 0.25 && size > min_length) {
+            resize (items.length / 2);
+        }
+        return temp;
     }
 
     public T removeLast() {
-        if (isEmpty()) {
-            return null;
-        }
-        T returnItem = items[size - 1];
-        items[size - 1] = null;
+        if (isEmpty()) return null;
+        T temp = items[minus_one(nextLast)];
+        items[minus_one(nextLast)] = null;
+        nextLast = minus_one(nextLast);
         size -= 1;
-        return returnItem;
+        if (getUtilizationRate() < 0.25 && size > min_length) {
+            resize (items.length / 2);
+        }
+        return temp;
     }
 
     public void printDeque() {
         for (int i = 0; i < size; i++) {
-            System.out.print(items[i] + " ");
+            System.out.print(items[(nextFirst + 1 + i) % items.length] + " ");
         }
     }
 
     public T get(int index) {
-        if (index < 0 || index >= size) {
-            return null;
-        }
-        return items[index];
+        if (index >= size || index < 0) return null;
+        return items[(nextFirst + 1 + index) % items.length];
     }
-
-
 }

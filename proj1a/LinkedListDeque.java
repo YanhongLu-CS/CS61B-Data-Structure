@@ -1,6 +1,6 @@
 // deque 的意思是双端队列
 public class LinkedListDeque<T> {
-    public static class Node<T> {
+    private static class Node<T> {
         public Node<T> prev;
         public Node<T> next;
         public T item;
@@ -20,19 +20,19 @@ public class LinkedListDeque<T> {
         size = 0;
     }
 
-    public LinkedListDeque(LinkedListDeque<T> other) {
-        this();
-        Node<T> ptr = other.sentinel.next;
-        while (ptr != other.sentinel) {
-            addLast(ptr.item);
-            ptr = ptr.next;
-        }
-    }
+    // public LinkedListDeque(LinkedListDeque<T> other) {
+    //     this();
+    //     Node<T> ptr = other.sentinel.next;
+    //     while (ptr != other.sentinel) {
+    //         addLast(ptr.item);
+    //         ptr = ptr.next;
+    //     }
+    // }
 
-    public LinkedListDeque(T item) {
-        this();
-        addFirst(item);
-    }
+    // public LinkedListDeque(T item) {
+    //     this();
+    //     addFirst(item);
+    // }
 
     public int size() {
         return size;
